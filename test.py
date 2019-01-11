@@ -1,137 +1,41 @@
-#!/usr/bin/python
+import requests
+from bs4 import BeautifulSoup
+from datetime import date
+import calendar
+
+def news():
+    # the target we want to open
+    url = 'https://www.????'
+
+    # open with GET method
+    resp = requests.get(url)
+
+    # http_respone 200 means OK status
+    if resp.status_code == 200:
+        print("Successfully opened the web page")
+        print("The news are as follow :-\n")
+        my_date = date.today()
+        tst = calendar.day_name[my_date.weekday()]
+
+        # we need a parser,Python built-in HTML parser is enough .
+        soup = BeautifulSoup(resp.text, 'html.parser')
+
+        # l is the list which contains all the text i.e news
+        l = soup.findAll("h3", {"class": "product-name"})
+       
+        # now we want to print only the text part of the anchor.
+        # find all the elements of a, i.e anchor
+        for j in l: 
+          for i in j.contents:
+            f = open("demofile.txt", "a",encoding='utf-8')
+            f.write(tst+'-'+i+'\n')
+            print(i)
+        for i in range (20):
+            f.write('*')
+        f.write('\n')
+    else:
+        print("Error")
+
+
+news()
 
-# -*- coding: utf-8 -*-
-
-
-
-
-
-"""
-
-=========================================================
-
-Logistic function
-
-=========================================================
-
-
-
-Shown in the plot is how the logistic regression would, in this
-
-synthetic dataset, classify values as either 0 or 1,
-
-i.e. class one or two, using the logistic curve.
-
-
-
-"""
-
-print(__doc__)
-
-
-
-
-
-# Code source: Gael Varoquaux
-
-# License: BSD 3 clause
-
-
-
-import numpy as np
-
-import matplotlib.pyplot as plt
-
-
-
-from sklearn import linear_model
-
-
-
-# General a toy dataset:s it's just a straight line with some Gaussian noise:
-
-xmin, xmax = -5, 5
-
-n_samples = 100
-
-np.random.seed(0)
-
-X = np.random.normal(size=n_samples)
-
-y = (X > 0).astype(np.float)
-
-X[X > 0] *= 4
-
-X += .3 * np.random.normal(size=n_samples)
-
-
-
-X = X[:, np.newaxis]
-
-
-
-# Fit the classifier
-
-clf = linear_model.LogisticRegression(C=1e5, solver='lbfgs')
-
-clf.fit(X, y)
-
-
-
-# and plot the result
-
-plt.figure(1, figsize=(4, 3))
-
-plt.clf()
-
-plt.scatter(X.ravel(), y, color='black', zorder=20)
-
-X_test = np.linspace(-5, 10, 300)
-
-
-
-
-
-def model(x):
-
-    return 1 / (1 + np.exp(-x))
-
-
-
-
-
-loss = model(X_test * clf.coef_ + clf.intercept_).ravel()
-
-plt.plot(X_test, loss, color='red', linewidth=3)
-
-
-
-ols = linear_model.LinearRegression()
-
-ols.fit(X, y)
-
-plt.plot(X_test, ols.coef_ * X_test + ols.intercept_, linewidth=1)
-
-plt.axhline(.5, color='.5')
-
-
-
-plt.ylabel('y')
-
-plt.xlabel('X')
-
-plt.xticks(range(-5, 10))
-
-plt.yticks([0, 0.5, 1])
-
-plt.ylim(-.25, 1.25)
-
-plt.xlim(-4, 10)
-
-plt.legend(('Logistic Regression Model', 'Linear Regression Model'),
-
-           loc="lower right", fontsize='small')
-
-plt.tight_layout()
-
-plt.show()
